@@ -907,12 +907,17 @@
 
   /* How It Works 5-step */
   .hiw-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
     gap: 20px;
   }
+  .hiw-grid .hiw-card {
+    flex: 0 1 calc(33.333% - 14px);
+    min-width: 220px;
+  }
   @media (max-width: 880px) {
-    .hiw-grid { grid-template-columns: 1fr; max-width: 460px; margin: 0 auto; }
+    .hiw-grid .hiw-card { flex: 1 1 100%; max-width: 460px; }
   }
   .hiw-card {
     background: var(--surface);
