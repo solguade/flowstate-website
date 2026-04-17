@@ -1,0 +1,1391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Flowstate — AI Client Acquisition for Australian Mortgage Brokers</title>
+<!--
+  =====================================================================
+  CONFIG
+    CALENDLY: https://calendly.com/solomon-guade99/flowstate-strategy-call  (live)
+    EMAIL:    hello@flowstate.com.au  (placeholder — replace before sending)
+  (Search & replace site-wide to update.)
+  =====================================================================
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #07080b;
+    --bg-2: #0c0e14;
+    --surface: #11141c;
+    --surface-2: #161a24;
+    --border: rgba(255, 255, 255, 0.08);
+    --border-strong: rgba(255, 255, 255, 0.14);
+    --text: #f3f5f8;
+    --text-muted: #9aa3b2;
+    --text-dim: #6b7280;
+    --accent: #7afcb4;
+    --accent-2: #3ee0c8;
+    --accent-glow: rgba(122, 252, 180, 0.35);
+    --danger: #ff7a7a;
+    --gold: #f4c87a;
+    --radius: 16px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  /* Kill the default purple visited-link colour.
+     Generic anchors fall back to the parent's colour (nav / footer rules take over
+     via their own specificity). Buttons redeclare the correct colour on :visited
+     with enough specificity to beat the UA-default a:visited rule. */
+  a:visited { color: inherit; }
+  a, button, .btn, .tier-btn, .nav-cta {
+    -webkit-tap-highlight-color: transparent;
+  }
+  a.btn-primary:visited { color: #052017; }
+  a.btn-secondary:visited { color: var(--text); }
+  a.nav-cta:visited { color: var(--bg); }
+  a.tier-btn:visited { color: var(--text); }
+  .tier-featured a.tier-btn:visited { color: #052017; }
+  a.logo:visited { color: var(--text); }
+  .nav-links a:visited { color: var(--text-muted); }
+  .footer-inner a:visited { color: var(--text-dim); }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    font-size: 16px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
+  }
+
+  /* Ambient background */
+  .bg-glow {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    overflow: hidden;
+    pointer-events: none;
+  }
+  .bg-glow::before,
+  .bg-glow::after {
+    content: '';
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(120px);
+    opacity: 0.35;
+  }
+  .bg-glow::before {
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, #7afcb4 0%, transparent 60%);
+    top: -200px;
+    left: -150px;
+  }
+  .bg-glow::after {
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(circle, #3ee0c8 0%, transparent 60%);
+    top: 40%;
+    right: -150px;
+    opacity: 0.2;
+  }
+
+  .grid-bg {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+    background-size: 60px 60px;
+    mask-image: radial-gradient(ellipse at center top, #000 0%, transparent 70%);
+    -webkit-mask-image: radial-gradient(ellipse at center top, #000 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  /* Nav */
+  nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(7, 8, 11, 0.7);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+  }
+  .nav-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 0;
+  }
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 20px;
+    letter-spacing: -0.02em;
+    color: var(--text);
+    text-decoration: none;
+  }
+  .logo-mark {
+    width: 30px;
+    height: 30px;
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    border-radius: 8px;
+    position: relative;
+    box-shadow: 0 0 20px var(--accent-glow);
+  }
+  .logo-mark::before {
+    content: '';
+    position: absolute;
+    inset: 7px;
+    border: 2px solid var(--bg);
+    border-right-color: transparent;
+    border-bottom-color: transparent;
+    border-radius: 50%;
+    transform: rotate(-45deg);
+  }
+  .nav-links {
+    display: flex;
+    gap: 32px;
+    align-items: center;
+  }
+  .nav-links a {
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--text); }
+  .nav-cta {
+    padding: 10px 18px;
+    background: var(--text);
+    color: var(--bg);
+    border-radius: 100px;
+    font-weight: 600;
+    font-size: 14px;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .nav-cta:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 10px 30px rgba(255,255,255,0.15);
+  }
+  @media (max-width: 720px) {
+    .nav-links a:not(.nav-cta) { display: none; }
+  }
+
+  /* Hero */
+  .hero {
+    padding: 100px 0 120px;
+    text-align: center;
+    position: relative;
+  }
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border: 1px solid var(--border-strong);
+    border-radius: 100px;
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-bottom: 28px;
+    background: rgba(255,255,255,0.02);
+  }
+  .eyebrow .dot {
+    width: 6px;
+    height: 6px;
+    background: var(--accent);
+    border-radius: 50%;
+    box-shadow: 0 0 10px var(--accent-glow);
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+  h1 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: clamp(40px, 6vw, 76px);
+    font-weight: 700;
+    line-height: 1.02;
+    letter-spacing: -0.035em;
+    margin-bottom: 24px;
+    max-width: 900px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  h1 .grad-svg {
+    display: block;
+    width: 100%;
+    max-width: 820px;
+    height: auto;
+    margin: 4px auto 0;
+    overflow: visible;
+  }
+  .hero-sub {
+    font-size: clamp(17px, 1.6vw, 20px);
+    color: var(--text-muted);
+    max-width: 720px;
+    margin: 0 auto 40px;
+    line-height: 1.55;
+  }
+  .hero-sub strong { color: var(--text); font-weight: 600; }
+  .cta-row {
+    display: flex;
+    gap: 14px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 56px;
+  }
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 16px 28px;
+    border-radius: 100px;
+    font-weight: 600;
+    font-size: 15px;
+    text-decoration: none;
+    transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
+    border: 1px solid transparent;
+    cursor: pointer;
+  }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    color: #052017;
+    box-shadow: 0 10px 40px rgba(122, 252, 180, 0.25);
+  }
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 14px 50px rgba(122, 252, 180, 0.4);
+  }
+  .btn-secondary {
+    background: rgba(255,255,255,0.04);
+    color: var(--text);
+    border-color: var(--border-strong);
+  }
+  .btn-secondary:hover { background: rgba(255,255,255,0.08); }
+  .btn svg { width: 16px; height: 16px; }
+
+  .hero-trust {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    flex-wrap: wrap;
+    color: var(--text-dim);
+    font-size: 14px;
+  }
+  .hero-trust span {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .check {
+    color: var(--accent);
+    font-weight: 700;
+  }
+
+  /* Section headings */
+  .section {
+    padding: 100px 0;
+    position: relative;
+  }
+  .section-head {
+    text-align: center;
+    max-width: 760px;
+    margin: 0 auto 64px;
+  }
+  .section-tag {
+    color: var(--accent);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+  h2 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: clamp(32px, 4.5vw, 52px);
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+    margin-bottom: 20px;
+  }
+  .section-sub {
+    color: var(--text-muted);
+    font-size: 18px;
+    line-height: 1.6;
+  }
+
+  /* Problem cards */
+  .problem-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 20px;
+  }
+  .problem-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 32px 28px;
+    transition: border-color 0.2s, transform 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+  .problem-card:hover {
+    border-color: var(--border-strong);
+    transform: translateY(-2px);
+  }
+  .problem-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    background: rgba(255, 122, 122, 0.1);
+    color: var(--danger);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+    font-size: 20px;
+    border: 1px solid rgba(255, 122, 122, 0.18);
+  }
+  .problem-card h3 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 10px;
+    letter-spacing: -0.01em;
+  }
+  .problem-card p {
+    color: var(--text-muted);
+    font-size: 15px;
+    line-height: 1.55;
+  }
+
+  /* How it works / ROI band */
+  .roi-band {
+    background: linear-gradient(135deg, rgba(122, 252, 180, 0.08), rgba(62, 224, 200, 0.04));
+    border: 1px solid rgba(122, 252, 180, 0.15);
+    border-radius: 24px;
+    padding: 56px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .roi-band::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at top, rgba(122, 252, 180, 0.1), transparent 60%);
+    pointer-events: none;
+  }
+  .roi-number {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: clamp(56px, 8vw, 96px);
+    font-weight: 700;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 14px;
+  }
+  .roi-label {
+    font-size: 20px;
+    color: var(--text);
+    font-weight: 500;
+    margin-bottom: 10px;
+  }
+  .roi-sub {
+    color: var(--text-muted);
+    font-size: 16px;
+    max-width: 560px;
+    margin: 0 auto;
+  }
+  @media (max-width: 640px) {
+    .roi-band { padding: 40px 24px; }
+  }
+
+  /* Pricing */
+  .pricing-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    align-items: stretch;
+  }
+  @media (max-width: 980px) {
+    .pricing-grid { grid-template-columns: 1fr; max-width: 460px; margin: 0 auto; }
+  }
+
+  .tier {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 36px 32px;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    transition: transform 0.3s, border-color 0.3s;
+  }
+  .tier:hover { transform: translateY(-4px); }
+  .tier-featured {
+    background: linear-gradient(180deg, rgba(122, 252, 180, 0.06), var(--surface) 60%);
+    border: 1px solid rgba(122, 252, 180, 0.3);
+    box-shadow:
+      0 0 0 1px rgba(122, 252, 180, 0.1),
+      0 30px 80px -20px rgba(122, 252, 180, 0.25);
+    transform: scale(1.02);
+  }
+  .tier-featured:hover { transform: scale(1.02) translateY(-4px); }
+  @media (max-width: 980px) {
+    .tier-featured { transform: none; }
+    .tier-featured:hover { transform: translateY(-4px); }
+  }
+
+  .tier-badge {
+    position: absolute;
+    top: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    color: #052017;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 6px 14px;
+    border-radius: 100px;
+    box-shadow: 0 6px 20px var(--accent-glow);
+  }
+  .tier-name {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-muted);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+  .tier-price {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    margin-bottom: 6px;
+  }
+  .tier-price .amount {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 48px;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    color: var(--text);
+  }
+  .tier-price .period {
+    color: var(--text-muted);
+    font-size: 16px;
+  }
+  .tier-setup {
+    color: var(--text-dim);
+    font-size: 14px;
+    margin-bottom: 28px;
+  }
+  .tier-divider {
+    height: 1px;
+    background: var(--border);
+    margin-bottom: 24px;
+  }
+  .tier-features {
+    list-style: none;
+    margin-bottom: 32px;
+    flex-grow: 1;
+  }
+  .tier-features li {
+    display: flex;
+    gap: 12px;
+    padding: 10px 0;
+    font-size: 15px;
+    color: var(--text);
+    align-items: flex-start;
+  }
+  .tier-features li::before {
+    content: '';
+    flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+    margin-top: 3px;
+    border-radius: 50%;
+    background: rgba(122, 252, 180, 0.12);
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%237afcb4' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='20 6 9 17 4 12'/></svg>");
+    background-size: 10px;
+    background-repeat: no-repeat;
+    background-position: center;
+  }
+  .tier-features li.highlight {
+    color: var(--text);
+    font-weight: 500;
+  }
+  .tier-btn {
+    display: block;
+    text-align: center;
+    padding: 14px 20px;
+    border-radius: 100px;
+    font-weight: 600;
+    font-size: 15px;
+    text-decoration: none;
+    transition: all 0.2s;
+    border: 1px solid var(--border-strong);
+    color: var(--text);
+    background: rgba(255,255,255,0.03);
+  }
+  .tier-btn:hover {
+    background: rgba(255,255,255,0.08);
+    border-color: rgba(255,255,255,0.25);
+  }
+  .tier-featured .tier-btn {
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    color: #052017;
+    border-color: transparent;
+    box-shadow: 0 10px 30px rgba(122, 252, 180, 0.25);
+  }
+  .tier-featured .tier-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 14px 40px rgba(122, 252, 180, 0.4);
+  }
+
+  /* Guarantee */
+  .guarantee {
+    background:
+      linear-gradient(135deg, rgba(244, 200, 122, 0.06), transparent 60%),
+      var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    padding: 56px;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 40px;
+    align-items: center;
+  }
+  @media (max-width: 720px) {
+    .guarantee { grid-template-columns: 1fr; padding: 40px 28px; text-align: center; }
+  }
+  .guarantee-seal {
+    width: 130px;
+    height: 130px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, rgba(244,200,122,0.25), rgba(244,200,122,0.05));
+    border: 2px solid rgba(244, 200, 122, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    position: relative;
+    justify-self: center;
+  }
+  .guarantee-seal svg {
+    width: 62px;
+    height: 62px;
+    color: var(--gold);
+  }
+  .guarantee-seal::before {
+    content: '';
+    position: absolute;
+    inset: -10px;
+    border: 1px dashed rgba(244,200,122,0.2);
+    border-radius: 50%;
+  }
+  .guarantee h3 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin-bottom: 12px;
+  }
+  .guarantee p {
+    color: var(--text-muted);
+    font-size: 16px;
+    margin-bottom: 16px;
+  }
+  .guarantee-points {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    color: var(--text);
+    font-size: 14px;
+    font-weight: 500;
+  }
+  @media (max-width: 720px) {
+    .guarantee-points { justify-content: center; }
+  }
+  .guarantee-points span {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .guarantee-points .check {
+    color: var(--gold);
+  }
+
+  /* Final CTA */
+  .final-cta {
+    text-align: center;
+    background: linear-gradient(180deg, transparent, rgba(122, 252, 180, 0.04));
+    border-top: 1px solid var(--border);
+    padding: 100px 24px;
+  }
+  .final-cta h2 { max-width: 800px; margin: 0 auto 20px; }
+  .final-cta .section-sub { max-width: 620px; margin: 0 auto 36px; }
+
+  /* Footer */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 32px 0;
+    color: var(--text-dim);
+    font-size: 14px;
+  }
+  .footer-inner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+  .footer-inner a { color: var(--text-dim); text-decoration: none; transition: color 0.2s; }
+  .footer-inner a:hover { color: var(--text); }
+
+  /* How it works */
+  .steps-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+  @media (max-width: 880px) {
+    .steps-grid { grid-template-columns: 1fr; max-width: 460px; margin: 0 auto; }
+  }
+  .step-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 36px 32px;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.2s, border-color 0.2s;
+  }
+  .step-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--border-strong);
+  }
+  .step-num {
+    position: absolute;
+    top: 18px;
+    right: 26px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 64px;
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: -0.06em;
+    color: transparent;
+    -webkit-text-stroke: 1px rgba(122, 252, 180, 0.2);
+  }
+  .step-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, rgba(122,252,180,0.18), rgba(62,224,200,0.05));
+    border: 1px solid rgba(122, 252, 180, 0.22);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--accent);
+    margin-bottom: 22px;
+  }
+  .step-icon svg { width: 26px; height: 26px; }
+  .step-card h3 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 20px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    margin-bottom: 10px;
+  }
+  .step-card p {
+    color: var(--text-muted);
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  /* FAQ */
+  .faq {
+    max-width: 780px;
+    margin: 0 auto;
+  }
+  .faq-item {
+    border-bottom: 1px solid var(--border);
+  }
+  .faq-item:first-child { border-top: 1px solid var(--border); }
+  .faq-item summary {
+    list-style: none;
+    cursor: pointer;
+    padding: 24px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 24px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 18px;
+    font-weight: 500;
+    color: var(--text);
+    letter-spacing: -0.01em;
+    transition: color 0.2s;
+  }
+  .faq-item summary::-webkit-details-marker { display: none; }
+  .faq-item summary:hover { color: var(--accent); }
+  .faq-item summary .icon {
+    position: relative;
+    flex-shrink: 0;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 1px solid var(--border-strong);
+    background-color: transparent;
+    transition: transform 0.3s ease, border-color 0.3s ease, background-color 0.3s ease;
+  }
+  .faq-item summary .icon::before,
+  .faq-item summary .icon::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    background-color: var(--text);
+    border-radius: 1px;
+    transition: background-color 0.3s ease;
+  }
+  .faq-item summary .icon::before {
+    width: 11px;
+    height: 1.5px;
+    transform: translate(-50%, -50%);
+  }
+  .faq-item summary .icon::after {
+    width: 1.5px;
+    height: 11px;
+    transform: translate(-50%, -50%);
+  }
+  .faq-item[open] summary .icon {
+    background-color: rgba(122, 252, 180, 0.12);
+    border-color: rgba(122, 252, 180, 0.35);
+    transform: rotate(45deg);
+  }
+  .faq-item[open] summary .icon::before,
+  .faq-item[open] summary .icon::after {
+    background-color: var(--accent);
+  }
+  .faq-answer {
+    padding: 0 48px 28px 0;
+    color: var(--text-muted);
+    font-size: 16px;
+    line-height: 1.65;
+  }
+
+  /* Credibility */
+  .credibility {
+    padding: 0 0 40px;
+    text-align: center;
+  }
+  .credibility-card {
+    display: inline-flex;
+    align-items: center;
+    gap: 16px;
+    padding: 18px 28px;
+    border: 1px solid var(--border-strong);
+    border-radius: 100px;
+    background: rgba(255,255,255,0.02);
+    max-width: 780px;
+  }
+  @media (max-width: 640px) {
+    .credibility-card { border-radius: 18px; padding: 20px 22px; }
+  }
+  .credibility-flag {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    box-shadow: 0 0 16px var(--accent-glow);
+  }
+  .credibility-flag svg {
+    width: 16px;
+    height: 16px;
+    color: #052017;
+  }
+  .credibility-text {
+    font-size: 15px;
+    color: var(--text-muted);
+    text-align: left;
+    line-height: 1.5;
+  }
+  .credibility-text strong { color: var(--text); font-weight: 600; }
+
+  /* Scarcity banner */
+  .scarcity-banner {
+    background: rgba(122, 252, 180, 0.05);
+    border-bottom: 1px solid rgba(122, 252, 180, 0.12);
+    padding: 12px 24px;
+    text-align: center;
+    font-size: 14px;
+    color: var(--text-muted);
+    letter-spacing: 0.01em;
+  }
+  .scarcity-banner strong {
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  /* Social proof bar */
+  .social-proof {
+    padding: 60px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .social-proof-label {
+    text-align: center;
+    font-size: 14px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-weight: 600;
+    margin-bottom: 32px;
+  }
+  .social-proof-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  @media (max-width: 640px) {
+    .social-proof-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  .proof-stat {
+    text-align: center;
+    padding: 24px 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+  }
+  .proof-stat .stat-number {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    color: var(--accent);
+    margin-bottom: 6px;
+  }
+  .proof-stat .stat-label {
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.4;
+  }
+
+  /* How It Works 5-step */
+  .hiw-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px;
+  }
+  @media (max-width: 880px) {
+    .hiw-grid { grid-template-columns: 1fr; max-width: 460px; margin: 0 auto; }
+  }
+  .hiw-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 32px 26px;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.2s, border-color 0.2s;
+  }
+  .hiw-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--border-strong);
+  }
+  .hiw-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, rgba(122,252,180,0.18), rgba(62,224,200,0.05));
+    border: 1px solid rgba(122, 252, 180, 0.22);
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--accent);
+    margin-bottom: 18px;
+  }
+  .hiw-card h3 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 17px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    margin-bottom: 8px;
+  }
+  .hiw-card p {
+    color: var(--text-muted);
+    font-size: 14px;
+    line-height: 1.55;
+  }
+
+  /* Sticky floating CTA */
+  .floating-cta {
+    position: fixed;
+    bottom: 28px;
+    right: 28px;
+    z-index: 999;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 24px;
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    color: #052017;
+    font-weight: 700;
+    font-size: 14px;
+    border-radius: 100px;
+    text-decoration: none;
+    box-shadow: 0 8px 30px rgba(122, 252, 180, 0.35);
+    transition: transform 0.2s, box-shadow 0.2s;
+    animation: floatPulse 3s ease-in-out infinite;
+  }
+  .floating-cta:visited { color: #052017; }
+  .floating-cta:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 40px rgba(122, 252, 180, 0.5);
+  }
+  .floating-cta svg { width: 16px; height: 16px; }
+  @keyframes floatPulse {
+    0%, 100% { box-shadow: 0 8px 30px rgba(122, 252, 180, 0.35); }
+    50% { box-shadow: 0 8px 40px rgba(122, 252, 180, 0.55); }
+  }
+
+  /* Utility */
+  .highlight-text { color: var(--accent); }
+
+</style>
+</head>
+<body>
+
+<div class="bg-glow"></div>
+<div class="grid-bg"></div>
+
+<nav>
+  <div class="container nav-inner">
+    <a href="#" class="logo">
+      <span class="logo-mark"></span>
+      <span>Flowstate</span>
+    </a>
+    <div class="nav-links">
+      <a href="#problem">Problem</a>
+      <a href="#how">How it works</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#guarantee">Guarantee</a>
+      <a href="#faq">FAQ</a>
+      <a href="https://calendly.com/solomon-guade99/flowstate-strategy-call" target="_blank" rel="noopener" class="nav-cta">Book a call</a>
+    </div>
+  </div>
+</nav>
+
+<div class="scarcity-banner">
+  We take on a limited number of brokers each month — <strong>3 spots remaining for May 2026</strong>
+</div>
+
+<section class="hero">
+  <div class="container">
+    <div class="eyebrow"><span class="dot"></span> Built exclusively for solo Australian mortgage brokers</div>
+    <h1>
+      Qualified loan enquiries.<br />
+      <svg class="grad-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 820 96" role="img" aria-label="Delivered on autopilot." preserveAspectRatio="xMidYMid meet">
+        <defs>
+          <linearGradient id="heroGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#7afcb4"/>
+            <stop offset="50%" stop-color="#3ee0c8"/>
+            <stop offset="100%" stop-color="#6ac8ff"/>
+          </linearGradient>
+        </defs>
+        <text x="410" y="74" text-anchor="middle" font-family="'Space Grotesk', 'Inter', sans-serif" font-weight="700" font-size="78" letter-spacing="-2.8" fill="url(#heroGrad)">Delivered on autopilot.</text>
+      </svg>
+    </h1>
+    <p class="hero-sub">
+      I build AI-powered client acquisition systems for mortgage brokers that generate <strong>5–8 qualified loan enquiries every month on autopilot</strong> — without you spending a cent on ads or picking up a cold call.
+    </p>
+    <p style="font-size: clamp(15px, 1.3vw, 17px); color: var(--text-dim); max-width: 600px; margin: -24px auto 40px; line-height: 1.6; font-style: italic;">
+      While you sleep. While you settle. While you live your life.
+    </p>
+    <div class="cta-row">
+      <a href="https://calendly.com/solomon-guade99/flowstate-strategy-call" target="_blank" rel="noopener" class="btn btn-primary">
+        Book your strategy call
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </a>
+      <a href="#pricing" class="btn btn-secondary">See pricing</a>
+    </div>
+    <div class="hero-trust">
+      <span><span class="check">✓</span> No ad spend required</span>
+      <span><span class="check">✓</span> Live in 14 days</span>
+      <span><span class="check">✓</span> Cancel anytime</span>
+    </div>
+  </div>
+</section>
+
+<section class="social-proof">
+  <div class="container">
+    <div class="social-proof-label">Built for solo mortgage brokers across Australia</div>
+    <div class="social-proof-grid">
+      <div class="proof-stat">
+        <div class="stat-number">100+</div>
+        <div class="stat-label">Outreaches per day</div>
+      </div>
+      <div class="proof-stat">
+        <div class="stat-number">5–8</div>
+        <div class="stat-label">Enquiries per month</div>
+      </div>
+      <div class="proof-stat">
+        <div class="stat-number">14-day</div>
+        <div class="stat-label">Go-live</div>
+      </div>
+      <div class="proof-stat">
+        <div class="stat-number">Zero</div>
+        <div class="stat-label">Ad spend</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="problem">
+  <div class="container">
+    <div class="section-head">
+      <div class="section-tag">The broker bottleneck</div>
+      <h2>You're a loan writer — not a marketer</h2>
+      <p class="section-sub">
+        Most solo brokers are leaving six figures on the table every year. Not because they're bad at their job — but because the pipeline behind the job is broken.
+      </p>
+    </div>
+    <div class="problem-grid">
+      <div class="problem-card">
+        <div class="problem-icon">⏱</div>
+        <h3>Hours lost to manual prospecting</h3>
+        <p>LinkedIn scrolling, cold DMs, chasing warm intros. Every hour prospecting is an hour not writing loans — and there's no system behind any of it.</p>
+      </div>
+      <div class="problem-card">
+        <div class="problem-icon">❄</div>
+        <h3>Warm leads going cold</h3>
+        <p>An enquiry sits in your inbox for three days and the borrower has already signed with the broker who replied in three minutes. It happens every week.</p>
+      </div>
+      <div class="problem-card">
+        <div class="problem-icon">📉</div>
+        <h3>Unpredictable referral pipeline</h3>
+        <p>One month it's four settlements. The next it's nothing. You can't plan, can't scale, can't hire — because you don't control the top of the funnel.</p>
+      </div>
+      <div class="problem-card">
+        <div class="problem-icon">💸</div>
+        <h3>$2K–$8K commissions vanishing</h3>
+        <p>Every unconverted lead is a loan that settled with someone else. Over a year, that's easily the difference between a good year and a breakthrough one.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" style="padding-top: 40px;">
+  <div class="container">
+    <div class="roi-band">
+      <div class="section-tag" style="margin-bottom: 12px;">The ROI math</div>
+      <div class="roi-number">1 loan.</div>
+      <div class="roi-label">That's all it takes to pay for the entire month.</div>
+      <p class="roi-sub">
+        One settled loan generates $2,000–$8,000 in commission. Flowstate retainers start at $1,497/month. Everything past that first settlement is pure profit — and the system is designed to deliver 5–8 qualified enquiries every single month.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="how">
+  <div class="container">
+    <div class="section-head">
+      <div class="section-tag">How it works</div>
+      <h2>Five steps. Zero effort from you.</h2>
+      <p class="section-sub">
+        From prospect discovery to booked calls — here's exactly what the Flowstate engine does behind the scenes.
+      </p>
+    </div>
+    <div class="hiw-grid">
+
+      <div class="hiw-card">
+        <div class="hiw-num">1</div>
+        <h3>Apollo finds your prospects</h3>
+        <p>Apollo finds 100+ mortgage brokers daily matching your ideal client profile.</p>
+      </div>
+
+      <div class="hiw-card">
+        <div class="hiw-num">2</div>
+        <h3>Clay researches every lead</h3>
+        <p>Clay researches each one and pulls their background, niche, and specialisation.</p>
+      </div>
+
+      <div class="hiw-card">
+        <div class="hiw-num">3</div>
+        <h3>Claude AI writes the email</h3>
+        <p>Claude AI writes a unique personalised email for every single broker.</p>
+      </div>
+
+      <div class="hiw-card">
+        <div class="hiw-num">4</div>
+        <h3>Instantly sends &amp; follows up</h3>
+        <p>Instantly sends your sequence automatically and follows up until they reply.</p>
+      </div>
+
+      <div class="hiw-card">
+        <div class="hiw-num">5</div>
+        <h3>Enquiries land in Calendly</h3>
+        <p>Qualified loan enquiries land directly in your Calendly. You just show up.</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<section class="section" id="pricing">
+  <div class="container">
+    <div class="section-head">
+      <div class="section-tag">Pricing</div>
+      <h2>Three tiers. One engine.</h2>
+      <p class="section-sub">
+        Pick the tier that matches your ambition. Every plan includes the full Flowstate acquisition engine — no contracts, cancel anytime.
+      </p>
+    </div>
+
+    <div class="pricing-grid">
+
+      <!-- Starter -->
+      <div class="tier">
+        <div class="tier-name">Starter</div>
+        <div class="tier-price">
+          <span class="amount">$1,497</span>
+          <span class="period">/month</span>
+        </div>
+        <div class="tier-setup">+ $500 one-time setup</div>
+        <div class="tier-divider"></div>
+        <ul class="tier-features">
+          <li class="highlight">100 qualified outreaches per day</li>
+          <li>3-message follow-up sequence</li>
+          <li>Warm leads automatically flagged</li>
+          <li>CRM of all conversations</li>
+          <li>Weekly performance snapshot</li>
+        </ul>
+        <a href="https://calendly.com/solomon-guade99/flowstate-strategy-call" target="_blank" rel="noopener" class="tier-btn">Start with Starter</a>
+      </div>
+
+      <!-- Growth - Featured -->
+      <div class="tier tier-featured">
+        <div class="tier-badge">Most Popular</div>
+        <div class="tier-name">Growth</div>
+        <div class="tier-price">
+          <span class="amount">$2,497</span>
+          <span class="period">/month</span>
+        </div>
+        <div class="tier-setup">+ $500 one-time setup</div>
+        <div class="tier-divider"></div>
+        <ul class="tier-features">
+          <li class="highlight">300 qualified outreaches per day</li>
+          <li>AI sales support agent</li>
+          <li>Booking automation into your calendar</li>
+          <li>Full follow-up &amp; nurture sequences</li>
+          <li>Weekly reports &amp; optimisation</li>
+          <li>Warm lead scoring &amp; prioritisation</li>
+        </ul>
+        <a href="https://calendly.com/solomon-guade99/flowstate-strategy-call" target="_blank" rel="noopener" class="tier-btn">Choose Growth</a>
+      </div>
+
+      <!-- Full Engine -->
+      <div class="tier">
+        <div class="tier-name">Full Engine</div>
+        <div class="tier-price">
+          <span class="amount">$4,497</span>
+          <span class="period">/month</span>
+        </div>
+        <div class="tier-setup">+ $500 one-time setup</div>
+        <div class="tier-divider"></div>
+        <ul class="tier-features">
+          <li class="highlight">Everything in Growth</li>
+          <li>Full admin automation suite</li>
+          <li>AI content agent (posts &amp; outreach)</li>
+          <li>Monthly strategy call with founder</li>
+          <li>Priority system optimisation</li>
+          <li>Hands-off client acquisition engine</li>
+        </ul>
+        <a href="https://calendly.com/solomon-guade99/flowstate-strategy-call" target="_blank" rel="noopener" class="tier-btn">Go Full Engine</a>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<section class="section" id="guarantee">
+  <div class="container">
+    <div class="guarantee">
+      <div class="guarantee-seal">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 2l2.39 4.84L20 8l-4 3.9.94 5.5L12 15l-4.94 2.4L8 11.9 4 8l5.61-1.16L12 2z"/>
+          <circle cx="12" cy="12" r="10" stroke-dasharray="2 3" opacity="0.4"/>
+        </svg>
+      </div>
+      <div>
+        <div class="section-tag" style="margin-bottom: 10px;">The Flowstate Guarantee</div>
+        <h3>Your system is live in 14 days — or your first month is free.</h3>
+        <p>I'm that confident in the build. If we haven't deployed your acquisition engine and started outreach inside two weeks of kickoff, the next month is on me.</p>
+        <div class="guarantee-points">
+          <span><span class="check">✓</span> No long-term contracts</span>
+          <span><span class="check">✓</span> Cancel anytime</span>
+          <span><span class="check">✓</span> 14-day go-live promise</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="faq">
+  <div class="container">
+    <div class="section-head">
+      <div class="section-tag">FAQ</div>
+      <h2>Straight answers.</h2>
+      <p class="section-sub">
+        Everything brokers usually ask before we kick off. If there's a question I haven't covered, ask me on the call.
+      </p>
+    </div>
+
+    <div class="faq">
+      <details class="faq-item">
+        <summary>How is this different from ads?<span class="icon"></span></summary>
+        <div class="faq-answer">
+          Ads bid for attention — costs climb, click-through drops, and you're competing with every broker in the country for the same eyeballs. Flowstate targets prospects who already fit your ideal borrower profile, reaches out 1-to-1, and nurtures them until they're ready to talk. No ad spend, no algorithm whims, no tyre-kicker clicks.
+        </div>
+      </details>
+
+      <details class="faq-item">
+        <summary>What do I need to provide?<span class="icon"></span></summary>
+        <div class="faq-answer">
+          About 30 minutes on the kickoff call, your ideal-borrower profile (loan type, geography, deal size), and your calendar link. That's it. I handle the copy, the sequences, the inboxing, the deliverability, and the ongoing optimisation.
+        </div>
+      </details>
+
+      <details class="faq-item">
+        <summary>How quickly will I see results?<span class="icon"></span></summary>
+        <div class="faq-answer">
+          Outreach goes live within 14 days of kickoff — guaranteed. First warm replies typically land in week 2–3. Most brokers book their first qualified call inside the first 30 days, with steady pipeline flow from month 2 onwards.
+        </div>
+      </details>
+
+      <details class="faq-item">
+        <summary>What if I want to cancel?<span class="icon"></span></summary>
+        <div class="faq-answer">
+          Cancel anytime with 7 days' notice. No lock-ins, no contracts, no cancellation fees. Every lead and conversation in your CRM stays yours — you walk away with the pipeline.
+        </div>
+      </details>
+
+      <details class="faq-item">
+        <summary>Who is Flowstate?<span class="icon"></span></summary>
+        <div class="faq-answer">
+          A small AI automation studio in Brisbane, Australia. I build acquisition engines exclusively for solo mortgage brokers — that's the entire niche. I cap at 8 active clients at a time so every engine gets built and tuned personally.
+        </div>
+      </details>
+    </div>
+  </div>
+</section>
+
+<section class="credibility">
+  <div class="container">
+    <div class="credibility-card">
+      <div class="credibility-flag">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+          <circle cx="12" cy="10" r="3"/>
+        </svg>
+      </div>
+      <div class="credibility-text">
+        Built by <strong>Flowstate</strong> — an AI automation studio based in Brisbane, Australia, helping solo mortgage brokers compete like firms ten times their size.
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="final-cta" id="book">
+  <div class="container">
+    <div class="section-tag">Ready when you are</div>
+    <h2>Stop prospecting.<br />Start settling.</h2>
+    <p class="section-sub">
+      Book a 30-minute strategy call. I'll walk you through exactly how the engine would work inside your business — no pitch deck, no pressure. If it's a fit, we kick off the next week.
+    </p>
+    <div class="cta-row" style="margin-bottom: 0;">
+      <a href="https://calendly.com/solomon-guade99/flowstate-strategy-call" target="_blank" rel="noopener" class="btn btn-primary">
+        Book your strategy call
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="container footer-inner">
+    <div style="display: flex; align-items: center; gap: 10px;">
+      <span class="logo-mark" style="width: 22px; height: 22px; border-radius: 6px;"></span>
+      <span>© Flowstate · AI client acquisition for Australian mortgage brokers</span>
+    </div>
+    <div style="display: flex; gap: 24px;">
+      <a href="#problem">Problem</a>
+      <a href="#pricing">Pricing</a>
+      <a href="mailto:hello@flowstate.com.au?subject=Flowstate%20enquiry">Contact</a>
+    </div>
+  </div>
+</footer>
+
+<a href="https://calendly.com/solomon-guade99/flowstate-strategy-call" target="_blank" rel="noopener" class="floating-cta">
+  Book your call
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+</a>
+
+<script>
+  // FAQ: single-open accordion — opening one closes the others.
+  // Native <details>/<summary> handles the click-to-toggle and [open] icon swap
+  // on its own; this just enforces one-at-a-time behaviour.
+  (function () {
+    var items = document.querySelectorAll('.faq-item');
+    items.forEach(function (item) {
+      item.addEventListener('toggle', function () {
+        if (item.open) {
+          items.forEach(function (other) {
+            if (other !== item) other.open = false;
+          });
+        }
+      });
+    });
+  })();
+</script>
+
+</body>
+</html>
